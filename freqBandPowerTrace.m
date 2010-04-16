@@ -1,3 +1,11 @@
+function [powtrace freqHz] = freqBandPowerTrace(epochs, smoothwidth)
+% [powtrace freqHz] = freqBandPowerTrace(epochs, smoothwidth)
+% plots power density in standard EEG frequency bands over time
+
+if(~exist('smoothwidth','var'))
+    smoothwidth = 60; % bigger = smoother
+end
+
 %% set up frequency bands and info
 freqHz = [0.25, 2; ...   % delta
              2, 8; ...   % theta
@@ -24,17 +32,18 @@ end
 
 %% reject outliers from obvious artifacts
 
-thresh = 1e4;
-powtrace(powtrace > thresh) = NaN;
+maxzscore = 5;
+reject = sum(abs(zscore(powtrace)),2) > maxzscore;
+powtrace(reject,:) = NaN;
+disp('Rejected %d epochs due to artifacts', sum(reject));
 
 %% plot smoothedband power vs. time traces
-span = 60; % bigger = smoother
 
 figure(1), clf;
 hold on
 thour = epochs.sec / 3600;
 for f = 1:nfreq
-   plot(thour, smooth(powtrace(:,f),span), '-',...
+   plot(thour, smooth(powtrace(:,f),smoothwidth), '-',...
        'LineWidth', 2, 'Color', freqColor(f,:));
 end
 

@@ -1,4 +1,8 @@
 function epochs = importScoredFFT(fname)
+% epochs = importScoredFFT(fname)
+% imports data from SleepSign export using FFT->Text Output->Continuous
+%   and constructs a struct with timestamped per-epoch scoring labels and 
+%   power spectra 
 
 if(~exist('fname','var'))
     [file path] = uigetfile({'*.txt;*.dat', 'Text Files'}, ...
