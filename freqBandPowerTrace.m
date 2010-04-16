@@ -35,7 +35,7 @@ end
 maxzscore = 5;
 reject = sum(abs(zscore(powtrace)),2) > maxzscore;
 powtrace(reject,:) = NaN;
-disp('Rejected %d epochs due to artifacts', sum(reject));
+fprintf('Rejected %d/%d epochs due to artifacts\n', sum(reject), nepoch);
 
 %% plot smoothedband power vs. time traces
 
