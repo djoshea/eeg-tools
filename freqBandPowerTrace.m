@@ -18,8 +18,11 @@ freqColor = [0.18 1 1; ...
              .118 .973 0; ...
              .878 .035 1; ...
              .816 0 0];
-         
 nfreq = size(freqHz,1);
+
+scoreLabels = {'IE', 'BU', 'SW', 'W'};
+scoreColors = jet(length(scoreLabels));
+nscore = length(scoreLabels);
 
 %% process data set
 nepoch = size(epochs.fft,1);
@@ -40,6 +43,8 @@ fprintf('Rejected %d/%d epochs due to artifacts\n', sum(reject), nepoch);
 %% plot smoothedband power vs. time traces
 
 figure(1), clf;
+
+subplot(3,1,1:2);
 hold on
 thour = epochs.sec / 3600;
 for f = 1:nfreq
@@ -50,7 +55,31 @@ end
 ylabel('Mean Power Spectral Density uV^2 / Hz');
 xlabel('Time (hr)');
 xlim([0 max(thour)]);
-title('Band Power Density vs. Time');
+title('Band Power Density vs. Time: EMG');
 box off
-
 legend(freqName, 'Location', 'Best');
+
+epochScore = zeros(nepoch,1);
+epochScore(:) = NaN;
+subplot(3,1,3);
+hold on
+for s = 1:nscore
+   epochsThisScore = cellfun(@(str) strcmp(scoreLabels{s},str), epochs.score);
+   plot(thour(epochsThisScore), s, 'o', 'MarkerSize', 4, ...
+       'Color', scoreColors(s,:), 'MarkerFaceColor', scoreColors(s,:));
+   epochScore(epochsThisScore) = s;
+end
+
+cla
+hold on
+for e = 1:nepoch-1
+    if(~isnan(epochScore(e)) && ~isnan(epochScore(e+1)))
+        line([thour(e) thour(e+1)], [epochScore(e) epochScore(e+1)], ...
+           'LineWidth', 2, 'Color', [0.2 0.2 0.2]);
+    end
+end
+set(gca, 'YTick', 1:nscore);
+set(gca, 'YTickLabel', scoreLabels);
+ylabel('Sleep Stage');
+xlabel('Time (hr)');
+xlim([0 max(thour)]);
