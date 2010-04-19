@@ -59,18 +59,15 @@ title('Band Power Density vs. Time: EMG');
 box off
 legend(freqName, 'Location', 'Best');
 
+% create score index list
 epochScore = zeros(nepoch,1);
 epochScore(:) = NaN;
-subplot(3,1,3);
-hold on
 for s = 1:nscore
    epochsThisScore = cellfun(@(str) strcmp(scoreLabels{s},str), epochs.score);
-   plot(thour(epochsThisScore), s, 'o', 'MarkerSize', 4, ...
-       'Color', scoreColors(s,:), 'MarkerFaceColor', scoreColors(s,:));
    epochScore(epochsThisScore) = s;
 end
 
-cla
+subplot(3,1,3);
 hold on
 for e = 1:nepoch-1
     if(~isnan(epochScore(e)) && ~isnan(epochScore(e+1)))
